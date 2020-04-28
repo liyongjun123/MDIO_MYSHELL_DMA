@@ -194,10 +194,7 @@ void uart1_process(uint8_t *buf, uint16_t len)
 	
 	if(strncmp("help", (char *)buf, 4) == 0)
 	{
-		printf("==================================\r\n");
-		printf("read  <phyAddr|all> <regAddr|all>\r\n");
-		printf("write <phyAddr> <regAddr> <value>\r\n");
-		printf("==================================\r\n");
+		help();
 		
 	}else if(strncmp("read", (char *)buf, 4) == 0)
 	{
@@ -239,7 +236,7 @@ void uart1_process(uint8_t *buf, uint16_t len)
 					for(int j = 0; j < 32; j++)
 					{
 						value = read_data(i, j);
-						printf("Read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", i, j, value);
+						printf("read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", i, j, value);
 //						HAL_Delay(10);
 					}
 				}
@@ -253,7 +250,7 @@ void uart1_process(uint8_t *buf, uint16_t len)
 				for(int i = 0; i < 32; i++)
 				{
 					value = read_data(i, regad);
-					printf("Read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", i, regad, value);
+					printf("read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", i, regad, value);
 				}
 			}
 			
@@ -271,7 +268,7 @@ void uart1_process(uint8_t *buf, uint16_t len)
 				for(int i = 0; i < 32; i++)
 				{
 					value = read_data(phyad, i);
-					printf("Read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, i, value);
+					printf("read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, i, value);
 //					HAL_Delay(1);
 				}
 			}else
@@ -283,7 +280,7 @@ void uart1_process(uint8_t *buf, uint16_t len)
 				uint16_t value = 0;
 
 				value = read_data(phyad, regad);
-				printf("Read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
+				printf("read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
 			}
 		}
 		
@@ -335,12 +332,161 @@ void uart1_process(uint8_t *buf, uint16_t len)
 		sscanf(pvalue, "%x", &value);
 		
 		write_data(phyad, regad, value);
-		printf("Write phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
+		printf("write phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
 		
 		value = read_data(phyad, regad);
-		printf("Read  phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
+		printf("eead  phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
 
 	}
+	else if(strncmp("8367read", (char *)buf, 8) == 0)
+	{
+		/* 8367read all 00 */
+		/* 8367read 00  00 */
+		/* 8367read 00  all */
+		/* 8367read all all */
+		
+		/* read */
+		strtok((char *)buf, " ");
+		
+		/* phyad */
+		char *pphyad = NULL;
+		pphyad = strtok(NULL, " ");
+		if(NULL == pphyad)
+		{
+			printf("8367read: para error!\r\n");
+			printf("8367read  <phyAddr|all> <regAddr|all>\r\n");
+			return;
+		}
+		
+		/* regad */
+		char *pregad = NULL;
+		pregad = strtok(NULL, " ");
+		if(NULL == pregad)
+		{
+			printf("8367read: para error!\r\n");
+			printf("8367read  <phyAddr|all> <regAddr|all>\r\n");
+			return;
+		}
+		
+		if(strncmp("all", pphyad, 3) == 0)
+		{
+			if(strncmp("all", pregad, 3) == 0)
+			{
+				uint16_t value = 0;
+				for(int i = 0; i < 32; i++)
+				{
+					for(int j = 0; j < 32; j++)
+					{
+						value = read_data_8367(i, j);
+						printf("8367read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", i, j, value);
+//						HAL_Delay(10);
+					}
+				}
+			}else
+			{
+				
+				uint32_t regad = 0;
+				sscanf(pregad, "%x", &regad);
+				
+				uint16_t value = 0;
+				for(int i = 0; i < 32; i++)
+				{
+					value = read_data_8367(i, regad);
+					printf("8367read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", i, regad, value);
+				}
+			}
+			
+		}
+		else
+		{
+			uint32_t phyad = 0;
+	//		printf("p = %s\n", p);
+			sscanf(pphyad, "%x", &phyad);
+	//		printf("regad = %x\n", regad);
+			
+			if(strncmp("all", pregad, 3) == 0)
+			{
+				uint16_t value = 0;
+				for(int i = 0; i < 32; i++)
+				{
+					value = read_data_8367(phyad, i);
+					printf("8367read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, i, value);
+//					HAL_Delay(1);
+				}
+			}else
+			{
+				
+				uint32_t regad = 0;
+				sscanf(pregad, "%x", &regad);
+				
+				uint16_t value = 0;
+
+				value = read_data_8367(phyad, regad);
+				printf("8367read phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
+			}
+		}
+		
+	}else if(strncmp("8367write", (char *)buf, 9) == 0)
+	{
+		/* write 00 1f 3 */
+		
+		/* write */
+		strtok((char *)buf, " ");
+		
+		/* phyad */
+		char *pphyad = NULL;
+		pphyad = strtok(NULL, " ");
+		if(NULL == pphyad)
+		{
+			printf("write: para error!\r\n");
+			printf("write <phyAddr> <regAddr> <data>\r\n");
+			return;
+		}
+		
+		/* regad */
+		char *pregad = NULL;
+		pregad = strtok(NULL, " ");
+		if(NULL == pregad)
+		{
+			printf("write: para error!\r\n");
+			printf("write <phyAddr> <regAddr> <data>\r\n");
+			return;
+		}
+		
+		/* value */
+		char *pvalue = NULL;
+		pvalue = strtok(NULL, " ");
+		if(NULL == pvalue)
+		{
+			printf("write: para error!\r\n");
+			printf("write <phyAddr> <regAddr> <data>\r\n");
+			return;
+		}
+		
+		uint32_t phyad = 0;
+		sscanf(pphyad, "%x", &phyad);
+		
+		uint32_t regad = 0;
+		sscanf(pregad, "%x", &regad);
+		
+		
+		uint32_t value = 0;
+		sscanf(pvalue, "%x", &value);
+		
+		write_data_8367(phyad, regad, value);
+		printf("8367write phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
+		
+		value = read_data_8367(phyad, regad);
+		printf("8367read  phy = 0x%02X reg = 0x%02X value = 0x%04X\r\n", phyad, regad, value);
+
+	}else
+	{
+		printf("unknown cmd!\r\n");
+	}
+	
+	
+	
+	
 	printf("\r\n");
 	
 }

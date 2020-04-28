@@ -174,10 +174,7 @@ void show(void)
 {
 	printf("\r\nMDIO for RTL8367RB\r\n\r\n");
 	
-	printf("==================================\r\n");
-	printf("read  <phyAddr|all> <regAddr|all>\r\n");
-	printf("write <phyAddr> <regAddr> <value>\r\n");
-	printf("==================================\r\n");
+	help();
 }
 
 
